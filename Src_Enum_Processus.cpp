@@ -2,6 +2,7 @@
 //
 // Objectif: Enumération de processus avec les API WIN32
 // V0.2: début du TP avec l'utilisation de l'API win32 
+// Voir fichier README dans GitHub
 //Enumération des processus PID
 
 
@@ -9,6 +10,7 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <psapi.h>
+#include <string.h>
 
 // To ensure correct resolution of symbols, add Psapi.lib to TARGETLIBS
 // and compile with -DPSAPI_VERSION=1
