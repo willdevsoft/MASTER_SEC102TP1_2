@@ -1,7 +1,7 @@
 // SEC102 TP1 Exercice2 by Wilfried Poisson
 //
 // Objectif: Enumération de processus avec les API WIN32
-// V0.1: début du TP avec l'utilisation de l'API win32 
+// V0.2: début du TP avec l'utilisation de l'API win32 
 //Enumération des processus PID
 
 
