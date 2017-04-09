@@ -2,7 +2,7 @@
 //
 // Objectif: Enumération de processus avec les API WIN32
 // V0.1: début du TP avec l'utilisation de l'API win32 
-//Enumération des processus 
+//Enumération des processus PID
 
 
 #include <windows.h>
