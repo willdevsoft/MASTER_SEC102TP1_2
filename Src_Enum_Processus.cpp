@@ -21,6 +21,9 @@ int PrintProcessNameAndID(DWORD processID)
 	DWORD cbNeeded; //rajout
 	unsigned int i; //rajout
 	HMODULE hMods[1024]; //rajout
+	DWORD dwFileSize2;
+	LARGE_INTEGER filesize2;
+
 	// Get a handle to the process.
 
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
@@ -45,9 +48,9 @@ int PrintProcessNameAndID(DWORD processID)
 
 	// Print the process name and identifier.
 
-	_tprintf(TEXT("%s  (PID: %u)\n"), szProcessName, processID);
+	_tprintf(TEXT("Processus name: %s  (PID: %u)\n"), szProcessName, processID);
 
-	// rajout ------------------------
+	// rajout module name and handle value
 
 	if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
 	{
@@ -62,16 +65,29 @@ int PrintProcessNameAndID(DWORD processID)
 			{
 				// Print the module name and handle value.
 
-				_tprintf(TEXT("\t%s (0x%08X)\n"), szModName, hMods[i]);
+				_tprintf(TEXT("\t Module name: %s    Handle value: (0x%08X)\n"), szModName, hMods[i]);
 			}
+// Rajout taille du module
+			DWORD dwFileSize;
+			DWORD dwFileType;
+			HANDLE hFile = CreateFile(szModName, GENERIC_READ, FILE_SHARE_READ, NULL,
+				OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, NULL);
+			// Get the file size...
+			dwFileSize = GetFileSize(hFile, NULL);
+			printf(" size: %d bytes\n", dwFileSize);
 		}
 	}
+
 
 	// Fin rajout --------------------
 	// Release the handle to the process.
 
 	CloseHandle(hProcess);
 }
+
+
+
+
 
 int main(void)
 {
