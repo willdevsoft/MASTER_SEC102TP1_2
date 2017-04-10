@@ -15,16 +15,19 @@
 // To ensure correct resolution of symbols, add Psapi.lib to TARGETLIBS
 // and compile with -DPSAPI_VERSION=1
 
-void PrintProcessNameAndID(DWORD processID)
+int PrintProcessNameAndID(DWORD processID)
 {
 	TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
-
+	DWORD cbNeeded; //rajout
+	unsigned int i; //rajout
+	HMODULE hMods[1024]; //rajout
 	// Get a handle to the process.
 
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
 		PROCESS_VM_READ,
 		FALSE, processID);
-
+	if (NULL == hProcess)
+		return 1;
 	// Get the process name.
 
 	if (NULL != hProcess)
@@ -44,6 +47,27 @@ void PrintProcessNameAndID(DWORD processID)
 
 	_tprintf(TEXT("%s  (PID: %u)\n"), szProcessName, processID);
 
+	// rajout ------------------------
+
+	if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
+	{
+		for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+		{
+			TCHAR szModName[MAX_PATH];
+
+			// Get the full path to the module's file.
+
+			if (GetModuleFileNameEx(hProcess, hMods[i], szModName,
+				sizeof(szModName) / sizeof(TCHAR)))
+			{
+				// Print the module name and handle value.
+
+				_tprintf(TEXT("\t%s (0x%08X)\n"), szModName, hMods[i]);
+			}
+		}
+	}
+
+	// Fin rajout --------------------
 	// Release the handle to the process.
 
 	CloseHandle(hProcess);
