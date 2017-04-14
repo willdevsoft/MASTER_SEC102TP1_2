@@ -23,7 +23,7 @@
     <ProjectGuid>{C7515C4E-EA4A-4FEE-A0CF-1108BE1081F4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Enum_Processus</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
