@@ -11,83 +11,9 @@
 #include <tchar.h>
 #include <psapi.h>
 #include <string.h>
+#include "HeaderEnumProcessus.h"
 
-// To ensure correct resolution of symbols, add Psapi.lib to TARGETLIBS
-// and compile with -DPSAPI_VERSION=1
-
-int PrintProcessNameAndID(DWORD processID)
-{
-	TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
-	DWORD cbNeeded; //rajout
-	unsigned int i; //rajout
-	HMODULE hMods[1024]; //rajout
-	DWORD dwFileSize2;
-	LARGE_INTEGER filesize2;
-
-	// Get a handle to the process.
-
-	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
-		PROCESS_VM_READ,
-		FALSE, processID);
-	if (NULL == hProcess)
-		return 1;
-	// Get the process name.
-
-	if (NULL != hProcess)
-	{
-		HMODULE hMod;
-		DWORD cbNeeded;
-
-		if (EnumProcessModules(hProcess, &hMod, sizeof(hMod),
-			&cbNeeded))
-		{
-			GetModuleBaseName(hProcess, hMod, szProcessName,
-				sizeof(szProcessName) / sizeof(TCHAR));
-		}
-	}
-
-	// Print the process name and identifier.
-
-	_tprintf(TEXT("Processus name: %s  (PID: %u)\n"), szProcessName, processID);
-
-	// rajout module name and handle value
-
-	if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
-	{
-		for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
-		{
-			TCHAR szModName[MAX_PATH];
-
-			// Get the full path to the module's file.
-
-			if (GetModuleFileNameEx(hProcess, hMods[i], szModName,
-				sizeof(szModName) / sizeof(TCHAR)))
-			{
-				// Print the module name and handle value.
-
-				_tprintf(TEXT("\t Module name: %s    Handle value: (0x%08X)\n"), szModName, hMods[i]);
-			}
-// Rajout taille du module
-			DWORD dwFileSize;
-			DWORD dwFileType;
-			HANDLE hFile = CreateFile(szModName, GENERIC_READ, FILE_SHARE_READ, NULL,
-				OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, NULL);
-			// Get the file size...
-			dwFileSize = GetFileSize(hFile, NULL);
-			printf(" size: %d bytes\n", dwFileSize);
-		}
-	}
-
-
-	// Fin rajout --------------------
-	// Release the handle to the process.
-
-	CloseHandle(hProcess);
-}
-
-
-
-
+using namespace std;
 
 int main(void)
 {
@@ -101,12 +27,9 @@ int main(void)
 		return 1;
 	}
 
-
-	// Calculate how many process identifiers were returned.
-
+	// Calcul le nombre de process identifiés
 	cProcesses = cbNeeded / sizeof(DWORD);
-
-	// Print the name and process identifier for each process.
+	// Affiche le nom et l'identifiant pour chaque process.
 
 	for (i = 0; i < cProcesses; i++)
 	{
@@ -118,3 +41,76 @@ int main(void)
 
 	return 0;
 }
+
+
+
+// Fonction permettant d'afficher:
+// nom du Process/id/Chemin/Taille
+
+
+int PrintProcessNameAndID(DWORD processID)
+{
+	TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
+	DWORD cbNeeded; //rajout
+	unsigned int i; //rajout
+	HMODULE hMods[1024]; //rajout
+	DWORD dwFileSize2;
+	LARGE_INTEGER filesize2;
+
+	// Récupére un handle du process.
+
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+		PROCESS_VM_READ,
+		FALSE, processID);
+	if (NULL == hProcess)
+		return 1;
+
+	// Si valeur du handle non nul alors
+	// On récupére le nom du process.
+	if (NULL != hProcess)
+	{
+		HMODULE hMod;
+		DWORD cbNeeded;
+
+		if (EnumProcessModules(hProcess, &hMod, sizeof(hMod),
+			&cbNeeded))
+		{
+			GetModuleBaseName(hProcess, hMod, szProcessName,
+				sizeof(szProcessName) / sizeof(TCHAR));
+		}
+	}
+
+	// Affiche le nom du process et son identifiant PID.
+
+	_tprintf(TEXT("Processus name: %s  (PID: %u)\n"), szProcessName, processID);
+
+	// Récuperation du nom du module et de la valeur du handle
+
+	if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
+	{
+		for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+		{
+			TCHAR szModName[MAX_PATH];
+			DWORD dwModuleSize;
+
+			HANDLE hModule = CreateFile(szModName, GENERIC_READ, FILE_SHARE_READ, NULL,
+				OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, NULL);
+			// Récupére la taille du module
+			dwModuleSize = GetFileSize(hModule, NULL);
+			// Récupére le chemin complet du module (fichier).
+
+			if (GetModuleFileNameEx(hProcess, hMods[i], szModName,
+				sizeof(szModName) / sizeof(TCHAR)))
+			{
+			// Affiche le nom du module et la valeur du handle.
+
+				_tprintf(TEXT("\t Module name: %s    Handle value: (0x%08X)  size: %d bytes\n"), szModName, hMods[i], dwModuleSize);
+			}
+
+		}
+	}
+	CloseHandle(hProcess);
+}
+
+
+
