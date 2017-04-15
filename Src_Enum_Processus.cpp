@@ -17,7 +17,7 @@ using namespace std;
 
 int main(void)
 {
-	// Get the list of process identifiers.
+	// Récupére la liste des process identifiés.
 
 	DWORD aProcesses[1024], cbNeeded, cProcesses;
 	unsigned int i;
